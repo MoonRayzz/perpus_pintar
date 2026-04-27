@@ -1,0 +1,25 @@
+{
+  "name": "Kiosk Perpustakaan SMPN 1 Banjar",
+  "short_name": "Kiosk Perpus",
+  "description": "Sistem Check-in dan Check-out Perpustakaan Digital",
+  "start_url": "/kiosk",
+  "scope": "/kiosk",
+  "display": "fullscreen",
+  "background_color": "#000613",
+  "theme_color": "#000613",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/images/LOGO.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/LOGO.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

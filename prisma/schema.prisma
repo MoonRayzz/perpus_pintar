@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// --- TABEL AUTENTIKASI --- //
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String   // Akan menyimpan password yang sudah di-hash (misal pakai bcrypt)
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// --- TABEL ENTITAS UTAMA --- //
+model Student {
+  id           String   @id @default(cuid())
+  nis          String   @unique
+  name         String
+  class        String
+  qrCodeHash   String   @unique
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  visits       Visit[]
+  loans        Loan[]
+}
+
+model Book {
+  id            String   @id @default(cuid())
+  isbn          String   @unique
+  title         String
+  author        String
+  publisher     String?
+  publishYear   Int?
+  category      String?
+  coverUrl      String?
+  stock         Int      @default(1)
+  stockTotal    Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  loans         Loan[]
+}
+
+// --- TABEL TRANSAKSI --- //
+model Visit {
+  id           String    @id @default(cuid())
+  studentId    String
+  checkInTime  DateTime  @default(now())
+  checkOutTime DateTime?
+  
+  student      Student   @relation(fields: [studentId], references: [id])
+  feedback     Feedback?
+}
+
+model Loan {
+  id           String    @id @default(cuid())
+  studentId    String
+  bookId       String
+  borrowedAt   DateTime  @default(now())
+  dueDate      DateTime
+  returnedAt   DateTime?
+  isOverdue    Boolean   @default(false)
+  notes        String?
+
+  student      Student   @relation(fields: [studentId], references: [id])
+  book         Book      @relation(fields: [bookId], references: [id])
+}
+
+// --- TABEL FEEDBACK --- //
+model Feedback {
+  id        String   @id @default(cuid())
+  visitId   String   @unique
+  rating    Int      // 1 = buruk, 2 = biasa, 3 = bagus, 4 = luar biasa
+  createdAt DateTime @default(now())
+
+  visit     Visit    @relation(fields: [visitId], references: [id])
+  options   FeedbackOnOption[]
+}
+
+model FeedbackOption {
+  id    String @id @default(cuid())
+  label String 
+  type  FeedbackType 
+
+  feedbacks FeedbackOnOption[]
+}
+
+model FeedbackOnOption {
+  feedbackId       String
+  feedbackOptionId String
+  
+  feedback         Feedback       @relation(fields: [feedbackId], references: [id])
+  option           FeedbackOption @relation(fields: [feedbackOptionId], references: [id])
+
+  @@id([feedbackId, feedbackOptionId])
+}
+
+enum FeedbackType {
+  POSITIVE
+  NEGATIVE
+}
