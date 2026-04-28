@@ -103,18 +103,18 @@ export default function LaporanClient({
                         <span className="text-2xl mt-0.5">{v.feedback.rating === 4 ? "😍" : v.feedback.rating === 3 ? "👍" : v.feedback.rating === 2 ? "😐" : "😡"}</span>
                         
                         <div className="flex flex-col gap-2">
-                          {/* 1. Tampilkan Chip Pilihan (Jika ada) */}
+                          {/* 1. Tampilkan Chip Pilihan (Dengan Key yang Benar) */}
                           {v.feedback.options && v.feedback.options.length > 0 && (
                             <div className="flex flex-wrap gap-1">
-                              {v.feedback.options.map((opt: any) => (
-                                <span key={opt.id} className="bg-[#e5eeff] text-[#001f3f] text-[10px] px-2 py-0.5 rounded-full border border-blue-200">
+                              {v.feedback.options.map((opt: any, index: number) => (
+                                <span key={opt.feedbackOptionId || index} className="bg-[#e5eeff] text-[#001f3f] text-[10px] px-2 py-0.5 rounded-full border border-blue-200">
                                   {opt.option.label}
                                 </span>
                               ))}
                             </div>
                           )}
                           
-                          {/* 2. Tampilkan Komentar Manual (Jika ada) */}
+                          {/* 2. Tampilkan Komentar Manual */}
                           {v.feedback.comment && (
                             <p className="text-xs text-[#0b1c30] italic font-medium bg-[#f8f9ff] border border-[#c4c6cf] p-2 rounded-lg inline-block w-fit">
                               "{v.feedback.comment}"
