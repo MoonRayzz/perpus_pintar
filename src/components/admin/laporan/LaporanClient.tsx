@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar as CalendarIcon, Download, Loader2, ChevronLeft, ChevronRight, MessageSquare, History } from "lucide-react";
+import { Calendar as CalendarIcon, Download, Loader2, ChevronLeft, ChevronRight, History } from "lucide-react";
 import * as XLSX from "xlsx";
 import { getEnhancedExportData } from "@/app/(admin)/laporan/actions";
 
@@ -78,7 +78,7 @@ export default function LaporanClient({
                 <th className="px-6 py-4">Waktu / Tanggal</th>
                 <th className="px-6 py-4">Nama Siswa</th>
                 <th className="px-6 py-4">Check In/Out</th>
-                <th className="px-6 py-4">Feedback Admin/Layanan</th>
+                <th className="px-6 py-4 max-w-md">Feedback Admin/Layanan</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#c4c6cf] text-sm">
@@ -97,17 +97,31 @@ export default function LaporanClient({
                       {v.checkOutTime && <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded font-bold text-[10px]">OUT: {new Date(v.checkOutTime).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}</span>}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 max-w-md">
                     {v.feedback ? (
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{v.feedback.rating === 4 ? "😍" : v.feedback.rating === 3 ? "👍" : v.feedback.rating === 2 ? "😐" : "😡"}</span>
-                        <div className="flex flex-wrap gap-1">
-                          {v.feedback.options.map((opt: any) => (
-                            <span key={opt.id} className="bg-[#e5eeff] text-[#001f3f] text-[10px] px-2 py-0.5 rounded-full border border-blue-200">
-                              {opt.option.label}
-                            </span>
-                          ))}
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl mt-0.5">{v.feedback.rating === 4 ? "😍" : v.feedback.rating === 3 ? "👍" : v.feedback.rating === 2 ? "😐" : "😡"}</span>
+                        
+                        <div className="flex flex-col gap-2">
+                          {/* 1. Tampilkan Chip Pilihan (Jika ada) */}
+                          {v.feedback.options && v.feedback.options.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {v.feedback.options.map((opt: any) => (
+                                <span key={opt.id} className="bg-[#e5eeff] text-[#001f3f] text-[10px] px-2 py-0.5 rounded-full border border-blue-200">
+                                  {opt.option.label}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {/* 2. Tampilkan Komentar Manual (Jika ada) */}
+                          {v.feedback.comment && (
+                            <p className="text-xs text-[#0b1c30] italic font-medium bg-[#f8f9ff] border border-[#c4c6cf] p-2 rounded-lg inline-block w-fit">
+                              "{v.feedback.comment}"
+                            </p>
+                          )}
                         </div>
+
                       </div>
                     ) : (
                       <span className="text-[#c4c6cf] italic text-xs">Belum ada feedback</span>
@@ -121,10 +135,10 @@ export default function LaporanClient({
         
         {/* Pagination Control */}
         <div className="p-4 border-t border-[#c4c6cf] bg-[#f8f9ff] flex justify-between items-center">
-          <p className="text-xs text-[#74777f]">Menampilkan halaman {currentPage} dari {totalPages}</p>
+          <p className="text-xs text-[#74777f]">Menampilkan halaman {currentPage} dari {totalPages || 1}</p>
           <div className="flex gap-2">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="p-2 border rounded hover:bg-white disabled:opacity-30"><ChevronLeft size={16}/></button>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="p-2 border rounded hover:bg-white disabled:opacity-30"><ChevronRight size={16}/></button>
+            <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage <= 1} className="p-2 border rounded hover:bg-white disabled:opacity-30"><ChevronLeft size={16}/></button>
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage >= totalPages} className="p-2 border rounded hover:bg-white disabled:opacity-30"><ChevronRight size={16}/></button>
           </div>
         </div>
       </div>
