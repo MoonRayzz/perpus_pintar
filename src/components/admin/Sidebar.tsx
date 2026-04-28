@@ -4,86 +4,88 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { 
   LayoutDashboard, 
-  BookOpen, 
+  BookCopy, 
   ArrowRightLeft, 
   Users, 
-  BarChart3, 
-  HelpCircle,
-  LogOut
+  PieChart, 
+  LogOut, 
+  HelpCircle 
 } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const navigation = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Manajemen Buku", href: "/buku", icon: BookOpen },
-    { name: "Peminjaman", href: "/peminjaman", icon: ArrowRightLeft },
-    { name: "Data Siswa", href: "/siswa", icon: Users },
-    { name: "Laporan", href: "/laporan", icon: BarChart3 },
+  const menuItems = [
+    { name: "Dashboard", icon: LayoutDashboard, path: "/" },
+    { name: "Manajemen Buku", icon: BookCopy, path: "/buku" },
+    { name: "Peminjaman", icon: ArrowRightLeft, path: "/peminjaman" },
+    { name: "Data Siswa", icon: Users, path: "/siswa" },
+    { name: "Laporan", icon: PieChart, path: "/laporan" },
   ];
 
+  // Cek apakah sedang berada di halaman bantuan
+  const isBantuanActive = pathname === "/bantuan";
+
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-[#c4c6cf] bg-white flex flex-col pt-4 pb-8 z-50">
-      {/* Logo & Header */}
-      <div className="px-6 pb-6 border-b border-[#c4c6cf] mb-4 flex items-center gap-3">
-        <div className="w-10 h-10 shrink-0">
-          <Image 
-            src="/images/LOGO.png" 
-            alt="Logo SMPN 1 Banjar" 
-            width={40} 
-            height={40}
-            className="object-contain"
-            priority
-          />
+    <aside className="w-64 bg-white border-r border-[#c4c6cf] h-screen fixed left-0 top-0 flex flex-col shadow-sm">
+      
+      {/* Branding / Logo */}
+      <div className="h-20 flex items-center gap-3 px-6 border-b border-[#c4c6cf]">
+        <div className="w-10 h-10 relative">
+          <Image src="/images/LOGO.png" alt="Logo" fill className="object-contain" priority sizes="40px" />
         </div>
         <div>
-          <h1 className="text-xl font-black text-[#001f3f] leading-tight">SMPN 1 Banjar</h1>
-          <p className="text-[12px] font-semibold text-[#43474e]">Sistem Perpustakaan</p>
+          <h2 className="font-black text-[#001f3f] leading-none text-sm">SMPN 1 Banjar</h2>
+          <p className="text-[10px] font-bold text-[#74777f]">Sistem Perpustakaan</p>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav className="flex-1 px-4 flex flex-col gap-1 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
-          const Icon = item.icon;
-
+      {/* Main Navigation */}
+      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        {menuItems.map((item) => {
+          const isActive = pathname === item.path || (item.path !== "/" && pathname.startsWith(item.path));
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200 ease-in-out font-medium text-sm ${
-                isActive
-                  ? "bg-[#eff4ff] text-[#001f3f] border-r-2 border-[#001f3f] font-bold"
-                  : "text-[#43474e] hover:text-[#001f3f] hover:bg-[#eff4ff]"
-              }`}
-            >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-              {item.name}
+            <Link key={item.name} href={item.path}>
+              <div className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+                isActive 
+                  ? "bg-[#e5eeff] text-[#001f3f] shadow-sm border border-[#dce9ff]" 
+                  : "text-[#43474e] hover:bg-[#f8f9ff] hover:text-[#0b1c30]"
+              }`}>
+                <item.icon size={20} className={isActive ? "text-[#001f3f]" : "text-[#74777f]"} />
+                {item.name}
+              </div>
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer Actions */}
-      <div className="px-4 mt-auto flex flex-col gap-1 border-t border-[#c4c6cf] pt-4">
-        <Link
-          href="/bantuan"
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-[#43474e] hover:text-[#001f3f] hover:bg-[#eff4ff] transition-all duration-200 ease-in-out font-medium text-sm"
-        >
-          <HelpCircle size={20} />
-          Pusat Bantuan
+      {/* Bottom Actions (Pusat Bantuan & Logout) */}
+      <div className="p-4 border-t border-[#c4c6cf] space-y-2 bg-[#f8f9ff]">
+        
+        {/* Ubah Button menjadi Link ke /bantuan */}
+        <Link href="/bantuan">
+          <div className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
+            isBantuanActive
+              ? "bg-[#e5eeff] text-[#001f3f] shadow-sm border border-[#dce9ff]" 
+              : "text-[#43474e] hover:bg-white hover:text-[#0b1c30]"
+          }`}>
+            <HelpCircle size={18} className={isBantuanActive ? "text-[#001f3f]" : "text-[#74777f]"} />
+            Pusat Bantuan
+          </div>
         </Link>
-        <button
-          className="flex items-center gap-3 px-3 py-2 rounded-md text-[#43474e] hover:text-[#ba1a1a] hover:bg-[#ffdad6] transition-all duration-200 ease-in-out font-medium text-sm w-full text-left"
+        
+        <button 
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="w-full flex items-center gap-3 px-4 py-2.5 mt-2 rounded-xl font-bold text-sm text-[#ba1a1a] hover:bg-[#ffdad6] transition-all"
         >
-          <LogOut size={20} />
-          Keluar
+          <LogOut size={18} />
+          Keluar Sistem
         </button>
       </div>
+
     </aside>
   );
-}
+} 

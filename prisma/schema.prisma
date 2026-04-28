@@ -77,6 +77,7 @@ model Feedback {
   id        String   @id @default(cuid())
   visitId   String   @unique
   rating    Int      // 1 = buruk, 2 = biasa, 3 = bagus, 4 = luar biasa
+  comment   String?  // <--- TAMBAHKAN BARIS INI
   createdAt DateTime @default(now())
 
   visit     Visit    @relation(fields: [visitId], references: [id])

@@ -1,11 +1,15 @@
 // src/app/kiosk/layout.tsx
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
+
+// PISAHKAN PENGATURAN WARNA KE DALAM VIEWPORT SESUAI ATURAN BARU NEXT.JS
+export const viewport: Viewport = {
+  themeColor: "#000613",
+};
 
 export const metadata: Metadata = {
   title: "Kiosk Perpustakaan SMPN 1 Banjar",
   description: "Sistem Check-in dan Check-out Perpustakaan Digital",
   manifest: "/manifest.json",
-  themeColor: "#000613",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

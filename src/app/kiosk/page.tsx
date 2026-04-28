@@ -9,7 +9,6 @@ import confetti from "canvas-confetti";
 import Lottie from "lottie-react";
 import { processKioskScan, submitKioskFeedback } from "@/app/kiosk/actions";
 
-// Tambahan State: THANK_YOU
 type ScreenState = "STANDBY" | "SUCCESS" | "FEEDBACK_RATING" | "FEEDBACK_DETAIL" | "THANK_YOU";
 type ScanData = { type: "IN" | "OUT"; student: any; visitId: string } | null;
 
@@ -23,6 +22,7 @@ export default function KioskPage() {
   const [scanData, setScanData] = useState<ScanData>(null);
   const [rating, setRating] = useState<number>(0);
   const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [customComment, setCustomComment] = useState(""); // <-- State Input Manual
 
   // State untuk menyimpan data JSON animasi Lottie
   const [thanksAnimationData, setThanksAnimationData] = useState<any>(null);
@@ -30,7 +30,7 @@ export default function KioskPage() {
   const inputRef = useRef<HTMLInputElement>(null);
   const manualInputRef = useRef<HTMLInputElement>(null);
 
-  // 1. Fetch file Lottie dari folder public (Aman di Next.js)
+  // 1. Fetch file Lottie dari folder public
   useEffect(() => {
     fetch("/animations/Thanks button.json")
       .then((res) => res.json())
@@ -52,13 +52,13 @@ export default function KioskPage() {
     return () => clearInterval(interval);
   }, [screen, isManualMode]);
 
-  // 3. Fallback Timer untuk Layar Terima Kasih (Jika Lottie macet/durasi terlalu panjang)
+  // 3. Fallback Timer untuk Layar Terima Kasih
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (screen === "THANK_YOU") {
       timeout = setTimeout(() => {
         resetKiosk();
-      }, 5000); // Batas maksimal 5 detik
+      }, 5000); 
     }
     return () => clearTimeout(timeout);
   }, [screen]);
@@ -84,10 +84,8 @@ export default function KioskPage() {
       });
 
       if (data?.type === "IN") {
-        // Jika Check-in: Langsung kembali ke standby setelah 5 detik
         setTimeout(() => resetKiosk(), 5000);
       } else {
-        // Jika Check-out: Pindah ke Feedback setelah 3 detik
         setTimeout(() => setScreen("FEEDBACK_RATING"), 3000);
       }
     } else {
@@ -114,14 +112,15 @@ export default function KioskPage() {
   // Submit Feedback & Transisi ke Layar Terima Kasih
   const handleFinalSubmit = async () => {
     if (scanData?.visitId) {
-      await submitKioskFeedback(scanData.visitId, rating);
+      // Mapping ID yang dipilih jadi teks aslinya
+      const selectedLabels = selectedReasons.map(id => reasonsList.find(r => r.id === id)?.text || "");
+      await submitKioskFeedback(scanData.visitId, rating, selectedLabels, customComment);
     }
-    setScreen("THANK_YOU"); // Pindah ke Lottie
+    setScreen("THANK_YOU"); 
   };
 
-  // Skip Feedback & Transisi ke Layar Terima Kasih
   const handleSkipFeedback = () => {
-    setScreen("THANK_YOU"); // Pindah ke Lottie
+    setScreen("THANK_YOU"); 
   };
 
   const resetKiosk = () => {
@@ -130,6 +129,7 @@ export default function KioskPage() {
     setScanData(null);
     setRating(0);
     setSelectedReasons([]);
+    setCustomComment(""); // <-- Reset input manual
   };
 
   const reasonsList = [
@@ -274,9 +274,11 @@ export default function KioskPage() {
           <motion.main key="feedback2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ duration: 0.3 }} className="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-4xl px-6 transform-gpu">
             <div className="text-center mb-8">
               <h1 className="text-3xl md:text-4xl font-black text-white mb-2">Ceritakan lebih lanjut (Opsional)</h1>
-              <p className="text-base text-[#afc8f0]">Apa yang membuatmu merasa demikian?</p>
+              <p className="text-base text-[#afc8f0]">Pilih alasan dan ketik masukanmu di bawah.</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-3 w-full max-w-3xl mb-10">
+            
+            {/* CHIPS ALASAN */}
+            <div className="flex flex-wrap justify-center gap-3 w-full max-w-3xl mb-6">
               {reasonsList.map((reason) => {
                 const isSelected = selectedReasons.includes(reason.id);
                 return (
@@ -286,6 +288,17 @@ export default function KioskPage() {
                 );
               })}
             </div>
+
+            {/* INPUT TEKS MANUAL */}
+            <div className="w-full max-w-2xl mb-10">
+              <textarea
+                value={customComment}
+                onChange={(e) => setCustomComment(e.target.value)}
+                placeholder="Atau ketik pesan/komentar tambahan Anda di sini..."
+                className="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white placeholder:text-white/40 focus:border-[#fcd400] focus:ring-1 focus:ring-[#fcd400] outline-none resize-none h-28 shadow-inner transition-colors font-medium"
+              />
+            </div>
+
             <div className="flex gap-4 w-full justify-center">
               <button onClick={handleSkipFeedback} className="px-6 py-3 md:px-8 md:py-4 rounded-2xl border-2 border-white/30 text-white font-bold text-base hover:bg-white/10 transition-colors">Lewati</button>
               <button onClick={handleFinalSubmit} className="px-8 py-3 md:px-12 md:py-4 rounded-2xl bg-[#fcd400] text-[#001f3f] font-black text-lg hover:bg-white transition-colors flex items-center gap-2 shadow-lg">Kirim Feedback <Send size={20} /></button>
@@ -323,7 +336,7 @@ export default function KioskPage() {
 
       </AnimatePresence>
 
-      {/* TICKER (TETAP AMAN & RINGAN) */}
+      {/* TICKER */}
       <footer className="absolute bottom-0 z-20 w-full bg-[#001f3f]/80 backdrop-blur-md border-t border-white/10 py-3 overflow-hidden pointer-events-none">
         <div className="flex whitespace-nowrap items-center font-bold text-sm md:text-base text-white/80 animate-ticker">
           {[1, 2, 3, 4].map((i) => (

@@ -48,8 +48,7 @@ const handler = NextAuth({
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        // TIDAK MENYETAK maxAge di sini = Menjadi "Session Cookie"
-        // Artinya: Cookie akan otomatis dibuang/dihapus oleh browser begitu browser di-close.
+        maxAge: 4 * 60 * 60, // Memaksa cookie kedaluwarsa dalam 4 jam, mengabaikan fitur "Continue where you left off" Chrome
       },
     },
   },

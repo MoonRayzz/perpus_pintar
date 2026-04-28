@@ -42,13 +42,32 @@ export async function processKioskScan(nis: string) {
   }
 }
 
-// 2. Simpan Feedback Siswa
-export async function submitKioskFeedback(visitId: string, rating: number) {
+// 2. Simpan Feedback Siswa (Update dengan Input Manual)
+export async function submitKioskFeedback(visitId: string, rating: number, reasons: string[], customComment: string) {
   try {
+    // A. Cek & Buat Master Data Option di DB (jika belum ada)
+    const optionIds = [];
+    for (const label of reasons) {
+      let opt = await prisma.feedbackOption.findFirst({ where: { label } });
+      if (!opt) {
+        opt = await prisma.feedbackOption.create({
+          data: { label, type: rating >= 3 ? "POSITIVE" : "NEGATIVE" }
+        });
+      }
+      optionIds.push(opt.id);
+    }
+
+    // B. Simpan Feedback, Relasi Chip, dan Komentar Manual
     await prisma.feedback.create({
       data: {
         visitId,
-        rating
+        rating,
+        comment: customComment.trim() !== "" ? customComment.trim() : null,
+        options: {
+          create: optionIds.map(id => ({
+            option: { connect: { id } }
+          }))
+        }
       }
     });
     return { success: true };

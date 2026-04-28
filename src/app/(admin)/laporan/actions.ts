@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 
 export async function getEnhancedExportData(filter: { startDate?: string; endDate?: string }) {
   try {
-    // 1. Ambil Data Peminjaman (Perbaikan: menggunakan borrowedAt bukan createdAt)
+    // 1. Ambil Data Peminjaman
     const loans = await prisma.loan.findMany({
       where: filter.startDate && filter.endDate ? {
         borrowedAt: {
@@ -60,7 +60,10 @@ export async function getEnhancedExportData(filter: { startDate?: string; endDat
         "Masuk": v.checkInTime.toLocaleTimeString('id-ID'),
         "Keluar": v.checkOutTime?.toLocaleTimeString('id-ID') || "-",
         "Rating": v.feedback?.rating || "-",
-        "Komentar": v.feedback?.options.map(o => o.option.label).join(", ") || "-"
+        "Komentar": [
+          v.feedback?.options?.map(o => o.option.label).join(", "), 
+          v.feedback?.comment
+        ].filter(Boolean).join(" | ") || "-"
       })),
       books: books.map(b => ({
         "ISBN": b.isbn,

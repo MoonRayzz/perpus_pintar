@@ -3,21 +3,26 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Library, BookOpen, Users, Star } from "lucide-react";
 
+// --- FITUR CACHE TINGKAT DEWA (ISR) ---
+// Halaman akan di-cache selama 10 detik. Mencegah database jebol/loading 
+// terus menerus jika data sudah ribuan, tapi tetap menjaga kebaruan data (Real-time).
+export const revalidate = 10; 
+
 // Fungsi untuk mengubah angka rating menjadi emoji
 const getRatingEmoji = (rating: number) => {
   switch (rating) {
     case 1: return "😡";
     case 2: return "😐";
-    case 3: return "👍"; // Bagus
-    case 4: return "😍"; // Luar biasa
+    case 3: return "👍";
+    case 4: return "😍";
     default: return "😐";
   }
 };
 
 export default async function AdminDashboard() {
-  // --- 1. AMBIL DATA DARI DATABASE VIA PRISMA ---
+  // --- 1. AMBIL DATA DARI DATABASE VIA PRISMA (OPTIMIZED FOR BIG DATA) ---
   
-  // A. Hitung Total Buku (berdasarkan jumlah fisik total, bukan sekadar judul)
+  // A. Hitung Total Buku (berdasarkan jumlah fisik total)
   const totalBooksResult = await prisma.book.aggregate({
     _sum: { stockTotal: true }
   });
@@ -49,15 +54,15 @@ export default async function AdminDashboard() {
   });
   const averageRating = ratingResult._avg.rating?.toFixed(1) || "0.0";
 
-  // E. Ambil Daftar Pengunjung Saat Ini (CheckOut belum dilakukan)
+  // E. Ambil Daftar Pengunjung Saat Ini (Dibatasi 10 agar memori tidak penuh)
   const currentVisitors = await prisma.visit.findMany({
     where: { checkOutTime: null },
-    include: { student: true }, // Tarik data siswa yang berelasi
+    include: { student: true }, 
     orderBy: { checkInTime: 'desc' },
-    take: 10
+    take: 10 
   });
 
-  // F. Ambil Feedback Terbaru
+  // F. Ambil Feedback Terbaru (Dibatasi 4 agar dashboard tetap rapi)
   const recentFeedback = await prisma.feedback.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
@@ -82,7 +87,7 @@ export default async function AdminDashboard() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {/* Card 1: Total Buku */}
-        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm">
+        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start mb-4">
             <span className="font-medium text-[#43474e] text-sm">Total Buku</span>
             <div className="p-2 bg-[#e5eeff] rounded-md text-[#001f3f]">
@@ -95,7 +100,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Card 2: Buku Dipinjam */}
-        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm">
+        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start mb-4">
             <span className="font-medium text-[#43474e] text-sm">Buku Dipinjam</span>
             <div className="p-2 bg-[#e5eeff] rounded-md text-[#001f3f]">
@@ -108,7 +113,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Card 3: Pengunjung Hari Ini */}
-        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm">
+        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start mb-4">
             <span className="font-medium text-[#43474e] text-sm">Pengunjung Hari Ini</span>
             <div className="p-2 bg-[#e5eeff] rounded-md text-[#001f3f]">
@@ -121,7 +126,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Card 4: Rata-rata Rating */}
-        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm">
+        <div className="bg-white border border-[#c4c6cf] rounded-xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
           <div className="flex justify-between items-start mb-4">
             <span className="font-medium text-[#43474e] text-sm">Rata-rata Rating</span>
             <div className="p-2 bg-[#fcd400] rounded-md text-[#6e5c00]">
@@ -142,8 +147,8 @@ export default async function AdminDashboard() {
         <div className="bg-white border border-[#c4c6cf] rounded-xl flex flex-col shadow-sm">
           <div className="p-5 border-b border-[#c4c6cf] flex justify-between items-center">
             <h3 className="text-lg font-bold text-[#0b1c30]">Pengunjung Saat Ini</h3>
-            <span className="text-xs font-semibold bg-[#e5eeff] text-[#001f3f] px-2 py-1 rounded-full">
-              Live
+            <span className="text-xs font-semibold bg-[#e5eeff] text-[#001f3f] px-2 py-1 rounded-full flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span> Live
             </span>
           </div>
           <div className="flex-1 overflow-y-auto max-h-[400px]">
@@ -197,19 +202,20 @@ export default async function AdminDashboard() {
             ) : (
               <div className="space-y-4">
                 {recentFeedback.map((fb) => {
-                  // Menggabungkan opsi feedback yang dipilih menjadi string
+                  // Menggabungkan opsi chip dan komentar manual
                   const selectedOptions = fb.options.map(opt => opt.option.label).join(", ");
+                  const finalComment = [selectedOptions, fb.comment].filter(Boolean).join(" | ");
                   
                   return (
                     <div key={fb.id} className="flex gap-4 p-4 rounded-lg bg-[#f8f9ff] border border-[#c4c6cf]">
-                      <div className="text-3xl shrink-0">
+                      <div className="text-3xl shrink-0 drop-shadow-sm">
                         {getRatingEmoji(fb.rating)}
                       </div>
                       <div>
-                        {selectedOptions ? (
-                          <p className="text-sm text-[#0b1c30] italic font-medium">"{selectedOptions}"</p>
+                        {finalComment ? (
+                          <p className="text-sm text-[#0b1c30] italic font-medium">"{finalComment}"</p>
                         ) : (
-                          <p className="text-sm text-[#0b1c30] italic">"Tanpa komentar tambahan."</p>
+                          <p className="text-sm text-[#0b1c30] italic text-opacity-50">"Tanpa komentar."</p>
                         )}
                         <p className="text-xs text-[#43474e] mt-2 font-medium">
                           - {fb.visit.student.name} ({fb.visit.student.class}), {fb.createdAt.toLocaleDateString('id-ID')}

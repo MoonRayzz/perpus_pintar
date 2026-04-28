@@ -17,6 +17,25 @@ export async function addStudent(data: { nis: string; name: string; class: strin
   }
 }
 
+// FUNGSI BARU: Edit Data Siswa
+export async function editStudent(id: string, data: { nis: string; name: string; class: string }) {
+  try {
+    await prisma.student.update({
+      where: { id },
+      data: {
+        nis: data.nis,
+        name: data.name,
+        class: data.class,
+      }
+    });
+    revalidatePath("/siswa");
+    return { success: true };
+  } catch (error) {
+    // Menangkap error jika user mengedit NIS menjadi NIS yang sudah dipakai siswa lain
+    return { success: false, error: "Gagal menyimpan. Pastikan NIS tidak bentrok dengan siswa lain." };
+  }
+}
+
 export async function deleteStudent(id: string) {
   try {
     await prisma.student.delete({ where: { id } });
@@ -27,10 +46,8 @@ export async function deleteStudent(id: string) {
   }
 }
 
-// Fungsi Baru: Import Masal dari Excel
 export async function importStudents(students: { nis: string; name: string; class: string }[]) {
   try {
-    // Siapkan data dengan field tambahan
     const dataToInsert = students.map(s => ({
       nis: String(s.nis).trim(),
       name: s.name.trim(),
@@ -38,7 +55,6 @@ export async function importStudents(students: { nis: string; name: string; clas
       qrCodeHash: `${String(s.nis).trim()}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
     }));
 
-    // Gunakan createMany dengan skipDuplicates agar tidak crash jika ada NIS ganda
     const result = await prisma.student.createMany({
       data: dataToInsert,
       skipDuplicates: true, 
