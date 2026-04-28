@@ -59,7 +59,10 @@ export async function getEnhancedExportData(filter: { startDate?: string; endDat
         "Kelas": v.student.class,
         "Masuk": v.checkInTime.toLocaleTimeString('id-ID'),
         "Keluar": v.checkOutTime?.toLocaleTimeString('id-ID') || "-",
-        "Rating": v.feedback?.rating || "-",
+        "Rating": v.feedback?.rating === 4 ? "Sangat Senang" : 
+                  v.feedback?.rating === 3 ? "Senang" : 
+                  v.feedback?.rating === 2 ? "Biasa" : 
+                  v.feedback?.rating === 1 ? "Sedih" : "-",
         "Komentar": [
           v.feedback?.options?.map(o => o.option.label).join(", "), 
           v.feedback?.comment

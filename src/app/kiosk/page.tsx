@@ -255,10 +255,10 @@ export default function KioskPage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl">
               {[
-                { val: 1, emoji: "😡", label: "Buruk" },
+                { val: 1, emoji: "😢", label: "Sedih" },
                 { val: 2, emoji: "😐", label: "Biasa" },
-                { val: 3, emoji: "😊", label: "Bagus" },
-                { val: 4, emoji: "😍", label: "Luar Biasa" },
+                { val: 3, emoji: "😊", label: "Senang" },
+                { val: 4, emoji: "😍", label: "Sangat Senang" },
               ].map((item) => (
                 <button key={item.val} onClick={() => handleRatingSelect(item.val)} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[32px] p-6 md:p-8 flex flex-col items-center justify-center gap-3 hover:bg-[#fcd400]/20 hover:border-[#fcd400] transition-colors group shadow-lg active:scale-95">
                   <span className="text-6xl md:text-[80px] drop-shadow-xl">{item.emoji}</span>
