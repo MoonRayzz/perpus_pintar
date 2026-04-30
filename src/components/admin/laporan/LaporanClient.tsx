@@ -26,6 +26,7 @@ export default function LaporanClient({
 
   const handleExport = async () => {
     setIsExporting(true);
+    // Menarik data dari actions (Kunjungan, Peminjaman, Buku, dan Pengaturan)
     const data = await getEnhancedExportData({ 
       startDate: filterDates.start, 
       endDate: filterDates.end 
@@ -33,11 +34,34 @@ export default function LaporanClient({
 
     const workbook = XLSX.utils.book_new();
     
-    // Buat 3 Sheet Berbeda
+    // Buat 3 Sheet Utama
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.visits), "Kunjungan & Feedback");
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.loans), "Data Peminjaman");
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(data.books), "Inventaris Buku");
 
+    // --- BUAT SHEET KE-4: KHUSUS PENGESAHAN DARI DATABASE ---
+    const s = data.settings;
+    const pengesahanData = [
+      { Kolom1: "PROFIL PERPUSTAKAAN", Kolom2: "" },
+      { Kolom1: "Nama Sekolah", Kolom2: s?.namaSekolah || "SMP Negeri 1 Banjar" },
+      { Kolom1: "Alamat", Kolom2: s?.alamat || "-" },
+      { Kolom1: "", Kolom2: "" },
+      { Kolom1: "Mengetahui,", Kolom2: "Buleleng, " + new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) },
+      { Kolom1: "Kepala Sekolah", Kolom2: "Pustakawan" },
+      { Kolom1: "", Kolom2: "" },
+      { Kolom1: "", Kolom2: "" },
+      { Kolom1: "", Kolom2: "" },
+      { Kolom1: s?.kepalaSekolah || "-", Kolom2: s?.pustakawan || "-" },
+      { Kolom1: `NIP. ${s?.nipKepala || "-"}`, Kolom2: `NIP. ${s?.nipPustakawan || "-"}` },
+    ];
+    
+    // skipHeader agar rapi tanpa judul tabel (Kolom1, Kolom2 tidak ikut ter-print)
+    const sheetPengesahan = XLSX.utils.json_to_sheet(pengesahanData, { skipHeader: true });
+    // Lebarkan kolom di Excel biar tulisan tidak kepotong
+    sheetPengesahan["!cols"] = [{ wch: 40 }, { wch: 40 }]; 
+    XLSX.utils.book_append_sheet(workbook, sheetPengesahan, "Profil & Pengesahan");
+
+    // Proses Download File
     XLSX.writeFile(workbook, `Laporan_Lengkap_Perpus_${new Date().toISOString().split('T')[0]}.xlsx`);
     setIsExporting(false);
   };
@@ -103,7 +127,7 @@ export default function LaporanClient({
                         <span className="text-2xl mt-0.5">{v.feedback.rating === 4 ? "😍" : v.feedback.rating === 3 ? "👍" : v.feedback.rating === 2 ? "😐" : "😡"}</span>
                         
                         <div className="flex flex-col gap-2">
-                          {/* 1. Tampilkan Chip Pilihan (Dengan Key yang Benar) */}
+                          {/* 1. Tampilkan Chip Pilihan */}
                           {v.feedback.options && v.feedback.options.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {v.feedback.options.map((opt: any, index: number) => (

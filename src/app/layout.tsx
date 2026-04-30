@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 
 // Konfigurasi Metadata dan OpenGraph (Preview Link WA/Sosmed)
 export const metadata: Metadata = {
+  metadataBase: new URL("https://perpus-pintar.vercel.app"), // <-- TAMBAHAN INI MEMPERBAIKI WARNING
   title: "Sistem Perpustakaan SMPN 1 Banjar",
   description: "Sistem Manajemen Perpustakaan Terpadu dan Digital untuk SMPN 1 Banjar.",
   openGraph: {
@@ -24,8 +25,8 @@ export const metadata: Metadata = {
     siteName: "Perpus SMPN 1 Banjar",
     images: [
       {
-        url: "/images/SEKOLAH.jpeg", // Menarik foto sekolah Anda
-        width: 1200, // Ukuran standar HD agar gambar tidak pecah di WA
+        url: "/images/SEKOLAH.jpeg", 
+        width: 1200, 
         height: 630,
         alt: "Gedung SMPN 1 Banjar",
       },
@@ -42,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="id" // Sudah diubah ke bahasa Indonesia
+      lang="id" 
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

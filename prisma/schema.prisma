@@ -72,6 +72,26 @@ model Loan {
   book         Book      @relation(fields: [bookId], references: [id])
 }
 
+// --- TABEL PENGATURAN SISTEM --- //
+model SystemSettings {
+  id              String   @id @default("default") // Kita set id selalu "default" karena cuma butuh 1 baris
+  
+  // Profil
+  namaSekolah     String   @default("SMP Negeri 1 Banjar")
+  alamat          String   @default("Jl. Pendidikan No. 1, Banjar, Buleleng, Bali")
+  kepalaSekolah   String   @default("Drs. I Wayan Contoh, M.Pd.")
+  nipKepala       String   @default("19700101 199512 1 001")
+  pustakawan      String   @default("Luh Putu Perpustakaan, S.I.P.")
+  nipPustakawan   String   @default("19850505 201001 2 002")
+  
+  // Aturan
+  maxPinjamHari   Int      @default(7)
+  maxBukuSiswa    Int      @default(3)
+  dendaPerHari    Int      @default(1000)
+
+  updatedAt       DateTime @updatedAt
+}
+
 // --- TABEL FEEDBACK --- //
 model Feedback {
   id        String   @id @default(cuid())
