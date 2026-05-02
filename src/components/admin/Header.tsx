@@ -4,7 +4,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, Bell, Settings, AlertTriangle, BookOpen, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { getNotifications } from "./headerActions";
+import { getNotifications } from "./headerActions"; // Import fungsi penarik data notifikasi
 
 export default function Header() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -24,7 +24,7 @@ export default function Header() {
     fetchNotifs();
   }, []);
 
-  // Tutup dropdown jika user klik di luar kotak
+  // Tutup dropdown jika user klik di luar kotak (UX yang bagus)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -63,16 +63,16 @@ export default function Header() {
         <div ref={dropdownRef} className="relative">
           <button 
             onClick={() => setIsNotifOpen(!isNotifOpen)}
-            className="text-[#43474e] hover:bg-[#eff4ff] p-2 rounded-full transition-colors active:scale-95 relative"
+            className="text-[#43474e] hover:bg-[#eff4ff] p-2 rounded-full transition-colors active:scale-95 relative cursor-pointer"
           >
             <Bell size={20} />
-            {/* Titik merah indikator jika ada notifikasi */}
+            {/* Titik merah indikator jika ada notifikasi telat/buku habis */}
             {notifications.length > 0 && (
               <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-[#ba1a1a] rounded-full border-2 border-white animate-pulse"></span>
             )}
           </button>
 
-          {/* Kotak Dropdown Notifikasi */}
+          {/* Kotak Dropdown Notifikasi yang Tampil ke Bawah */}
           {isNotifOpen && (
             <div className="absolute right-0 mt-2 w-80 bg-white border border-[#c4c6cf] rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
               <div className="p-4 border-b border-[#c4c6cf] bg-[#f8f9ff] flex justify-between items-center">

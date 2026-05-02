@@ -29,10 +29,9 @@ export async function getNotifications() {
       take: 5
     });
 
-    // Gabungkan dan format datanya
+    // Gabungkan dan format datanya untuk Notifikasi
     const notifications = [
       ...overdueLoans.map(loan => {
-        // Hitung telat berapa hari
         const due = new Date(loan.dueDate);
         due.setHours(0,0,0,0);
         const diffTime = today.getTime() - due.getTime();

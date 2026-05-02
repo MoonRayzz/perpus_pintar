@@ -49,13 +49,11 @@ export default function PengaturanClient({ initialSettings }: { initialSettings:
 
     try {
       if (activeTab === "profil") {
-        // Simpan tab profil ke database
         await updateSettings(profilData);
       } else if (activeTab === "aturan") {
-        // Simpan tab aturan ke database
         await updateSettings(aturanData);
       } else if (activeTab === "akun") {
-        // Untuk akun, logikanya akan butuh fungsi update password tersendiri ke tabel Admin
+        // Untuk fitur ubah sandi, logikanya akan disiapkan terpisah nanti
         setAkunData({ passwordLama: "", passwordBaru: "", konfirmasiPassword: "" });
       }
 
@@ -64,7 +62,6 @@ export default function PengaturanClient({ initialSettings }: { initialSettings:
       console.error(error);
     } finally {
       setIsLoading(false);
-      // Hilangkan pesan sukses setelah 3 detik
       setTimeout(() => setSuccessMsg(""), 3000);
     }
   };
