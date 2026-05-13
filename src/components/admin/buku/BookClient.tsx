@@ -150,7 +150,7 @@ export default function BookClient({ initialBooks }: { initialBooks: Book[] }) {
                     <td className="px-6 py-3">
                       <div className="w-10 h-14 bg-[#d3e4fe] rounded border border-[#c4c6cf] overflow-hidden flex items-center justify-center relative">
                         {book.coverUrl ? (
-                          <Image src={book.coverUrl} alt={`Cover`} fill className="object-cover" />
+                          <Image src={book.coverUrl} alt={`Cover ${book.title}`} fill sizes="40px" className="object-cover" />
                         ) : (
                           <ImageIcon size={20} className="text-[#74777f]" />
                         )}

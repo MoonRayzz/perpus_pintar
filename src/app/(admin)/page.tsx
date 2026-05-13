@@ -2,11 +2,13 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Library, BookOpen, Users, Star } from "lucide-react";
+import LiveEventListener from "@/components/admin/dashboard/LiveEventListener";
 
-// --- FITUR CACHE TINGKAT DEWA (ISR) ---
-// Halaman akan di-cache selama 10 detik. Mencegah database jebol/loading 
-// terus menerus jika data sudah ribuan, tapi tetap menjaga kebaruan data (Real-time).
-export const revalidate = 10; 
+// --- REALTIME DASHBOARD ---
+// force-dynamic: halaman TIDAK di-cache sama sekali.
+// Setiap kali router.refresh() dipanggil oleh LiveRefresher (setiap 5 detik),
+// Next.js akan menjalankan ulang semua query DB di bawah ini dan mengirim data terbaru ke browser.
+export const dynamic = "force-dynamic";
 
 // Fungsi untuk mengubah angka rating menjadi emoji
 const getRatingEmoji = (rating: number) => {
@@ -147,9 +149,8 @@ export default async function AdminDashboard() {
         <div className="bg-white border border-[#c4c6cf] rounded-xl flex flex-col shadow-sm">
           <div className="p-5 border-b border-[#c4c6cf] flex justify-between items-center">
             <h3 className="text-lg font-bold text-[#0b1c30]">Pengunjung Saat Ini</h3>
-            <span className="text-xs font-semibold bg-[#e5eeff] text-[#001f3f] px-2 py-1 rounded-full flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span> Live
-            </span>
+            {/* LiveEventListener: koneksi SSE persisten — hanya update saat ada scan */}
+            <LiveEventListener />
           </div>
           <div className="flex-1 overflow-y-auto max-h-[400px]">
             {currentVisitors.length === 0 ? (

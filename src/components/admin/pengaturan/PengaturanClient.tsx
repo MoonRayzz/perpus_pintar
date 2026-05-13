@@ -176,15 +176,15 @@ export default function PengaturanClient({ initialSettings }: { initialSettings:
               <div>
                 <label className="block text-xs font-bold text-[#43474e] uppercase mb-2">Maksimal Lama Pinjam (Hari)</label>
                 <div className="relative">
-                  <input type="number" value={aturanData.maxPinjamHari} onChange={e => setAturanData({...aturanData, maxPinjamHari: parseInt(e.target.value)})} className="w-full px-4 py-3 border-2 border-[#eff4ff] rounded-xl bg-[#f8f9ff] outline-none focus:border-[#001f3f] focus:bg-white font-black text-xl text-[#0b1c30] transition-colors" min="1" required />
-                  <span className="absolute right-4 top-3.5 font-bold text-[#74777f]">Hari</span>
+                  <input type="number" value={aturanData.maxPinjamHari} onChange={e => setAturanData({...aturanData, maxPinjamHari: parseInt(e.target.value)})} className="w-full px-4 pr-16 py-3 border-2 border-[#eff4ff] rounded-xl bg-[#f8f9ff] outline-none focus:border-[#001f3f] focus:bg-white font-black text-xl text-[#0b1c30] transition-colors [appearance:none] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" min="1" required />
+                  <span className="absolute right-4 top-3.5 font-bold text-[#74777f] pointer-events-none">Hari</span>
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-bold text-[#43474e] uppercase mb-2">Maksimal Buku Dipinjam Bersamaan</label>
                 <div className="relative">
-                  <input type="number" value={aturanData.maxBukuSiswa} onChange={e => setAturanData({...aturanData, maxBukuSiswa: parseInt(e.target.value)})} className="w-full px-4 py-3 border-2 border-[#eff4ff] rounded-xl bg-[#f8f9ff] outline-none focus:border-[#001f3f] focus:bg-white font-black text-xl text-[#0b1c30] transition-colors" min="1" required />
-                  <span className="absolute right-4 top-3.5 font-bold text-[#74777f]">Buku</span>
+                  <input type="number" value={aturanData.maxBukuSiswa} onChange={e => setAturanData({...aturanData, maxBukuSiswa: parseInt(e.target.value)})} className="w-full px-4 pr-16 py-3 border-2 border-[#eff4ff] rounded-xl bg-[#f8f9ff] outline-none focus:border-[#001f3f] focus:bg-white font-black text-xl text-[#0b1c30] transition-colors [appearance:none] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" min="1" required />
+                  <span className="absolute right-4 top-3.5 font-bold text-[#74777f] pointer-events-none">Buku</span>
                 </div>
               </div>
               <div>

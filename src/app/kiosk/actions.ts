@@ -2,6 +2,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { notifyDashboard } from "@/lib/sse-notifier";
 
 // 1. Proses Scan (Check-in / Check-out)
 export async function processKioskScan(nis: string) {
@@ -28,12 +29,16 @@ export async function processKioskScan(nis: string) {
         where: { id: activeVisit.id },
         data: { checkOutTime: new Date() }
       });
+      // 🔔 Push event ke semua dashboard yang sedang terbuka
+      notifyDashboard("check-out");
       return { success: true, type: "OUT", student, visitId: activeVisit.id };
     } else {
       // Jika belum ada, maka ini proses CHECK-IN
       const newVisit = await prisma.visit.create({
         data: { studentId: student.id, checkInTime: new Date() }
       });
+      // 🔔 Push event ke semua dashboard yang sedang terbuka
+      notifyDashboard("check-in");
       return { success: true, type: "IN", student, visitId: newVisit.id };
     }
   } catch (error) {
