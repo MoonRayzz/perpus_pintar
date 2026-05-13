@@ -160,7 +160,7 @@ export default function KioskPage() {
 
             <div className="mb-6 p-4 bg-white rounded-3xl shadow-[0_0_40px_rgba(252,212,0,0.2)] border-4 border-[#fcd400]/20 transform-gpu">
               <div className="relative w-20 h-20 md:w-28 md:h-28">
-                <Image src="/images/LOGO.png" alt="Logo" fill className="object-contain" priority />
+                <Image src="/images/LOGO.png" alt="Logo" fill sizes="(max-width: 768px) 80px, 112px" className="object-contain" priority />
               </div>
             </div>
 
